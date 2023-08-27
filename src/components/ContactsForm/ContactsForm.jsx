@@ -36,18 +36,19 @@ const validateNumber = number => {
 export const ContactsForm = ({ onAddContact }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [errors, setErrors] = useState({ name: '', number: '' });
+  const [nameError, setNameError] = useState('');
+  const [numberError, setNumberError] = useState('');
 
   const handleSubmit = event => {
     event.preventDefault();
 
-    const nameError = validateName(name);
-    const numberError = validateNumber(number);
+    const nameErr = validateName(name);
+    const numberErr = validateNumber(number);
 
-    if (nameError || numberError) {
-      setErrors({ name: nameError, number: numberError });
-      return;
-    }
+    setNameError(nameErr);
+    setNumberError(numberErr);
+
+    if (nameErr || numberErr) return; // Stop form submission if there's an error
 
     onAddContact({ id: nanoid(), name, number });
     setName('');
@@ -55,7 +56,7 @@ export const ContactsForm = ({ onAddContact }) => {
   };
 
   return (
-    <Form autoComplete="off" onSubmit={handleSubmit}>
+    <Form autoComplete="off" onSubmit={handleSubmit} noValidate>
       <FormField htmlFor="name">
         <FormFieldWrapper>
           <BsPersonFill size="18" />
@@ -66,11 +67,9 @@ export const ContactsForm = ({ onAddContact }) => {
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
-          pattern="^[a-zA-Zа-яА-Я]+(['\- ]?[a-zA-Zа-яА-Я ])*$"
-          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
         />
-        {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
+        {nameError && <ErrorMessage>{nameError}</ErrorMessage>}
       </FormField>
 
       <FormField htmlFor="number">
@@ -83,12 +82,9 @@ export const ContactsForm = ({ onAddContact }) => {
           type="tel"
           value={number}
           onChange={e => setNumber(e.target.value)}
-          pattern="/^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/
-"
-          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
         />
-        {errors.number && <ErrorMessage>{errors.number}</ErrorMessage>}
+        {numberError && <ErrorMessage>{numberError}</ErrorMessage>}
       </FormField>
 
       <BtnForm type="submit">
